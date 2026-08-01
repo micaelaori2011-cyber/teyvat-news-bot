@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands, tasks
+from noticias import revisar_noticias
 import os
 from dotenv import load_dotenv
 load_dotenv()

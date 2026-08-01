@@ -4,6 +4,6 @@ URL_NOTICIAS = "https://www.hoyolab.com/circles/2/27/official"
 def revisar_noticias():
     respuesta = requests.get(URL_NOTICIAS)
     if respuesta.status_code == 200:
-        return "📰 Página oficial de HoYoverse conectada correctamente."
+        return respuesta.text[:500]
     else:
         return "❌ No se pudo conectar con HoYoverse."

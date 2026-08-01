@@ -30,6 +30,8 @@ async def on_ready():
     if canal:
         await canal.send("🌸 Teyvat News está conectado correctamente.")
     print(f"✅ {bot.user} está conectado")
-
+@bot.command()
+async def ping(ctx):
+    await ctx.send("🏓 ¡Pong! Teyvat News está funcionando.")
 bot.run(TOKEN)
 

@@ -24,8 +24,15 @@ intents.guilds = True
 intents.message_content = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
+@tasks.loop(minutes=5)
+async def revisar_noticias():
+    canal = discord.utils.get(bot.get_all_channels(), name="𓏼﹒paimon﹒⭐")
+    if canal:
+        await canal.send("📰 Teyvat News está revisando novedades de Genshin Impact...")
+        
 @bot.event
 async def on_ready():
+    revisar_noticias.start()
     canal = discord.utils.get(bot.get_all_channels(), name="𓏼﹒paimon﹒⭐")
     if canal:
         await canal.send("🌸 Teyvat News está conectado correctamente.")

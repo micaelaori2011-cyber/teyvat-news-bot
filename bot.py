@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands, tasks
-from noticias import revisar_noticias
+from noticias import revisar_noticias as obtener_noticias
 import os
 from dotenv import load_dotenv
 load_dotenv()
@@ -29,7 +29,7 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 async def revisar_noticias():
     canal = discord.utils.get(bot.get_all_channels(), name="𓏼﹒paimon﹒⭐")
     if canal:
-        await canal.send("📰 Teyvat News está revisando novedades de Genshin Impact...")
+        await canal.send(obtener_noticias())
         
 @bot.event
 async def on_ready():

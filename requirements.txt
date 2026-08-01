@@ -5,3 +5,4 @@ python-dotenv==1.0.1
 audioop-lts
 Flask==3.0.3
 requests
+beautifulsoup4

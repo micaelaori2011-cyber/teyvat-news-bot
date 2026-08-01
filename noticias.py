@@ -9,6 +9,6 @@ def revisar_noticias():
 
     if respuesta.status_code == 200:
         datos = respuesta.json()
-        return str(datos)[:1000]
+        return datos["data"]["list"][0]["post"]["subject"]
 
     return "❌ No se pudo conectar con HoYoverse."

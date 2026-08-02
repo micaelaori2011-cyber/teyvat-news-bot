@@ -22,6 +22,7 @@ def revisar_noticias():
 
         titulo = datos["data"]["list"][0]["post"]["subject"]
         post_id = datos["data"]["list"][0]["post"]["post_id"]
+        url = f"https://www.hoyolab.com/article/{post_id}"
 
         if post_id == ULTIMA_NOTICIA:
             return ""
@@ -31,6 +32,6 @@ def revisar_noticias():
         with open(ARCHIVO_MEMORIA, "w") as archivo:
             archivo.write(post_id)
 
-        return titulo
+        return f"📰 {titulo}\n🔗 {url}"
 
     return "❌ No se pudo conectar con HoYoverse."

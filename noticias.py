@@ -5,7 +5,6 @@ URL_NOTICIAS = "https://bbs-api-os.hoyolab.com/community/post/wapi/getNewsList?g
 ULTIMA_NOTICIA = None
 ARCHIVO_MEMORIA = "ultima_noticia.txt"
 
-# Aquí guardaremos el sistema de noticias de Teyvat News
 def revisar_noticias():
     global ULTIMA_NOTICIA
 
@@ -25,7 +24,6 @@ def revisar_noticias():
         url = f"https://www.hoyolab.com/article/{post_id}"
 
         imagen = datos["data"]["list"][0]["post"]["cover"]
-        print("LA IMAGEN ES:", imagen)
 
         if not imagen:
             imagenes = datos["data"]["list"][0]["post"]["images"]
@@ -33,7 +31,7 @@ def revisar_noticias():
             if imagenes:
                 imagen = imagenes[0]
 
-        if False:
+        if post_id == ULTIMA_NOTICIA:
             return None
 
         ULTIMA_NOTICIA = post_id

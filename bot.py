@@ -51,7 +51,9 @@ async def revisar_noticias():
 
 @bot.event
 async def on_ready():
-    revisar_noticias.start()
+    if not revisar_noticias.is_running():
+        revisar_noticias.start()
+
     print(f"✅ {bot.user} está conectado")
 
 

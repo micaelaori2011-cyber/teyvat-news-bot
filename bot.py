@@ -34,7 +34,7 @@ async def revisar_noticias():
     if canal:
         noticia = obtener_noticias()
 
-        if noticia != "No hay noticias nuevas.":
+        if noticia:
             await canal.send(noticia)
 
 

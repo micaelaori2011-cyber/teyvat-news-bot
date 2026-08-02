@@ -1,36 +1,52 @@
-import requests
-from bs4 import BeautifulSoup
+import discord
+from discord.ext import commands, tasks
+from noticias import revisar_noticias as obtener_noticias
+import os
+from dotenv import load_dotenv
+load_dotenv()
+from flask import Flask
+from threading import Thread
 
-URL_NOTICIAS = "https://bbs-api-os.hoyolab.com/community/post/wapi/getNewsList?gids=2&type=1&page_size=1"
-ULTIMA_NOTICIA = None
-ARCHIVO_MEMORIA = "ultima_noticia.txt"
+app = Flask(__name__)
 
-# Aquí guardaremos el sistema de noticias de Teyvat News
-def revisar_noticias():
-    global ULTIMA_NOTICIA
+@app.route("/")
+def home():
+    return "Bot funcionando"
 
-    try:
-        with open(ARCHIVO_MEMORIA, "r") as archivo:
-            ULTIMA_NOTICIA = archivo.read()
-    except FileNotFoundError:
-        pass
+def run():
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 10000)))
 
-    respuesta = requests.get(URL_NOTICIAS)
+Thread(target=run).start()
 
-    if respuesta.status_code == 200:
-        datos = respuesta.json()
+TOKEN = os.getenv("DISCORD_TOKEN")
 
-        titulo = datos["data"]["list"][0]["post"]["subject"]
-        post_id = datos["data"]["list"][0]["post"]["post_id"]
+intents = discord.Intents.default()
+intents.guilds = True
+intents.message_content = True
 
-        if post_id == ULTIMA_NOTICIA:
-            return "No hay noticias nuevas."
+bot = commands.Bot(command_prefix="!", intents=intents)
 
-        ULTIMA_NOTICIA = post_id
 
-        with open(ARCHIVO_MEMORIA, "w") as archivo:
-            archivo.write(post_id)
+@tasks.loop(minutes=5)
+async def revisar_noticias():
+    canal = discord.utils.get(bot.get_all_channels(), name="𓏼﹒paimon﹒⭐")
 
-        return titulo
+    if canal:
+        noticia = obtener_noticias()
 
-    return "❌ No se pudo conectar con HoYoverse."
+        if noticia:
+            await canal.send(noticia)
+
+
+@bot.event
+async def on_ready():
+    revisar_noticias.start()
+    print(f"✅ {bot.user} está conectado")
+
+
+@bot.command()
+async def ping(ctx):
+    await ctx.send("🏓 ¡Pong! Teyvat News está funcionando.")
+
+
+bot.run(TOKEN)

@@ -29,6 +29,8 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 
 @tasks.loop(minutes=1)
 async def revisar_noticias():
+    print("Paimon está revisando noticias...")
+
     canal = discord.utils.get(bot.get_all_channels(), name="𓏼﹒paimon﹒⭐")
 
     if canal:

@@ -41,7 +41,7 @@ async def revisar_noticias():
                 color=0xf1c40f
             )
 
-            if noticia["imagen"]:
+            if noticia.get("imagen"):
                 embed.set_image(url=noticia["imagen"])
 
             await canal.send(embed=embed)

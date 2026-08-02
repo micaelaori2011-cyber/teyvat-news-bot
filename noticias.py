@@ -3,10 +3,17 @@ from bs4 import BeautifulSoup
 
 URL_NOTICIAS = "https://bbs-api-os.hoyolab.com/community/post/wapi/getNewsList?gids=2&type=1&page_size=1"
 ULTIMA_NOTICIA = None
+ARCHIVO_MEMORIA = "ultima_noticia.txt"
 
 # Aquí guardaremos el sistema de noticias de Teyvat News
 def revisar_noticias():
     global ULTIMA_NOTICIA
+
+    try:
+        with open(ARCHIVO_MEMORIA, "r") as archivo:
+            ULTIMA_NOTICIA = archivo.read()
+    except FileNotFoundError:
+        pass
 
     respuesta = requests.get(URL_NOTICIAS)
 
@@ -20,6 +27,10 @@ def revisar_noticias():
             return "No hay noticias nuevas."
 
         ULTIMA_NOTICIA = post_id
+
+        with open(ARCHIVO_MEMORIA, "w") as archivo:
+            archivo.write(post_id)
+
         return titulo
 
     return "❌ No se pudo conectar con HoYoverse."

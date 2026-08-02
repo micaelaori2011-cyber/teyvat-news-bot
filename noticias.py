@@ -2,13 +2,24 @@ import requests
 from bs4 import BeautifulSoup
 
 URL_NOTICIAS = "https://bbs-api-os.hoyolab.com/community/post/wapi/getNewsList?gids=2&type=1&page_size=1"
+ULTIMA_NOTICIA = None
 
 # Aquí guardaremos el sistema de noticias de Teyvat News
 def revisar_noticias():
+    global ULTIMA_NOTICIA
+
     respuesta = requests.get(URL_NOTICIAS)
 
     if respuesta.status_code == 200:
         datos = respuesta.json()
-        return datos["data"]["list"][0]["post"]["subject"]
+
+        titulo = datos["data"]["list"][0]["post"]["subject"]
+        post_id = datos["data"]["list"][0]["post"]["post_id"]
+
+        if post_id == ULTIMA_NOTICIA:
+            return "No hay noticias nuevas."
+
+        ULTIMA_NOTICIA = post_id
+        return titulo
 
     return "❌ No se pudo conectar con HoYoverse."

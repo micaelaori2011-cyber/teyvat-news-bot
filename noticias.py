@@ -1,7 +1,7 @@
 import requests
+from bs4 import BeautifulSoup
 
 URL_NOTICIAS = "https://bbs-api-os.hoyolab.com/community/post/wapi/getNewsList?gids=2&type=1&page_size=1"
-URL_POST = "https://bbs-api-os.hoyolab.com/community/post/wapi/getPostFull"
 
 ULTIMA_NOTICIA = None
 ARCHIVO_MEMORIA = "ultima_noticia.txt"
@@ -37,18 +37,25 @@ def revisar_noticias():
     contenido = "No se pudo obtener el contenido completo."
 
     try:
-        detalle = requests.get(
-            URL_POST,
-            params={"post_id": post_id}
-        )
+        pagina = requests.get(url)
 
-        if detalle.status_code == 200:
-            datos_post = detalle.json()
+        if pagina.status_code == 200:
+            sopa = BeautifulSoup(pagina.text, "html.parser")
 
-            contenido = datos_post["data"]["post"]["content"]
+            parrafos = sopa.find_all("p")
+
+            texto = []
+
+            for parrafo in parrafos:
+                if parrafo.text.strip():
+                    texto.append(parrafo.text.strip())
+
+            if texto:
+                contenido = "\n\n".join(texto)
 
     except Exception:
         pass
+
 
     ULTIMA_NOTICIA = post_id
 

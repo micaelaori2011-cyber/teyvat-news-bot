@@ -1,9 +1,11 @@
 import requests
-from bs4 import BeautifulSoup
 
 URL_NOTICIAS = "https://bbs-api-os.hoyolab.com/community/post/wapi/getNewsList?gids=2&type=1&page_size=1"
+URL_POST = "https://bbs-api-os.hoyolab.com/community/post/wapi/getPostFull"
+
 ULTIMA_NOTICIA = None
 ARCHIVO_MEMORIA = "ultima_noticia.txt"
+
 
 def revisar_noticias():
     global ULTIMA_NOTICIA
@@ -16,33 +18,46 @@ def revisar_noticias():
 
     respuesta = requests.get(URL_NOTICIAS)
 
-    if respuesta.status_code == 200:
-        datos = respuesta.json()
+    if respuesta.status_code != 200:
+        return None
 
-        titulo = datos["data"]["list"][0]["post"]["subject"]
-        post_id = datos["data"]["list"][0]["post"]["post_id"]
-        url = f"https://www.hoyolab.com/article/{post_id}"
+    datos = respuesta.json()
 
-        imagen = datos["data"]["list"][0]["post"]["cover"]
+    post = datos["data"]["list"][0]["post"]
 
-        if not imagen:
-            imagenes = datos["data"]["list"][0]["post"]["images"]
+    titulo = post["subject"]
+    post_id = post["post_id"]
+    url = f"https://www.hoyolab.com/article/{post_id}"
 
-            if imagenes:
-                imagen = imagenes[0]
+    if post_id == ULTIMA_NOTICIA:
+        return None
 
-        if post_id == ULTIMA_NOTICIA:
-            return None
+    imagen = post.get("cover")
 
-        ULTIMA_NOTICIA = post_id
+    contenido = "No se pudo obtener el contenido completo."
 
-        with open(ARCHIVO_MEMORIA, "w") as archivo:
-            archivo.write(post_id)
+    try:
+        detalle = requests.get(
+            URL_POST,
+            params={"post_id": post_id}
+        )
 
-        return {
-            "titulo": titulo,
-            "url": url,
-            "imagen": imagen
-        }
+        if detalle.status_code == 200:
+            datos_post = detalle.json()
 
-    return None
+            contenido = datos_post["data"]["post"]["content"]
+
+    except Exception:
+        pass
+
+    ULTIMA_NOTICIA = post_id
+
+    with open(ARCHIVO_MEMORIA, "w") as archivo:
+        archivo.write(post_id)
+
+    return {
+        "titulo": titulo,
+        "url": url,
+        "imagen": imagen,
+        "contenido": contenido
+    }

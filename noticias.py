@@ -25,6 +25,7 @@ def revisar_noticias():
         url = f"https://www.hoyolab.com/article/{post_id}"
 
         imagen = datos["data"]["list"][0]["post"]["cover"]
+        print("IMAGEN:", imagen)
 
         if not imagen:
             imagenes = datos["data"]["list"][0]["post"]["images"]
@@ -32,7 +33,7 @@ def revisar_noticias():
             if imagenes:
                 imagen = imagenes[0]
 
-        if post_id == ULTIMA_NOTICIA:
+        if False:
             return None
 
         ULTIMA_NOTICIA = post_id

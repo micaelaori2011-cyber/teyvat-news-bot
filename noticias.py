@@ -1,52 +1,36 @@
-import discord
-from discord.ext import commands, tasks
-from noticias import revisar_noticias as obtener_noticias
-import os
-from dotenv import load_dotenv
-load_dotenv()
-from flask import Flask
-from threading import Thread
+import requests
+from bs4 import BeautifulSoup
 
-app = Flask(__name__)
+URL_NOTICIAS = "https://bbs-api-os.hoyolab.com/community/post/wapi/getNewsList?gids=2&type=1&page_size=1"
+ULTIMA_NOTICIA = None
+ARCHIVO_MEMORIA = "ultima_noticia.txt"
 
-@app.route("/")
-def home():
-    return "Bot funcionando"
+# Aquí guardaremos el sistema de noticias de Teyvat News
+def revisar_noticias():
+    global ULTIMA_NOTICIA
 
-def run():
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 10000)))
+    try:
+        with open(ARCHIVO_MEMORIA, "r") as archivo:
+            ULTIMA_NOTICIA = archivo.read()
+    except FileNotFoundError:
+        pass
 
-Thread(target=run).start()
+    respuesta = requests.get(URL_NOTICIAS)
 
-TOKEN = os.getenv("DISCORD_TOKEN")
+    if respuesta.status_code == 200:
+        datos = respuesta.json()
 
-intents = discord.Intents.default()
-intents.guilds = True
-intents.message_content = True
+        titulo = datos["data"]["list"][0]["post"]["subject"]
+        post_id = datos["data"]["list"][0]["post"]["post_id"]
 
-bot = commands.Bot(command_prefix="!", intents=intents)
+        if post_id == ULTIMA_NOTICIA:
+            return ""
 
+        ULTIMA_NOTICIA = post_id
 
-@tasks.loop(minutes=5)
-async def revisar_noticias():
-    canal = discord.utils.get(bot.get_all_channels(), name="𓏼﹒paimon﹒⭐")
+        with open(ARCHIVO_MEMORIA, "w") as archivo:
+            archivo.write(post_id)
 
-    if canal:
-        noticia = obtener_noticias()
+        return titulo
 
-        if noticia:
-            await canal.send(noticia)
-
-
-@bot.event
-async def on_ready():
-    revisar_noticias.start()
-    print(f"✅ {bot.user} está conectado")
-
-
-@bot.command()
-async def ping(ctx):
-    await ctx.send("🏓 ¡Pong! Teyvat News está funcionando.")
-
-
-bot.run(TOKEN)
+    return "❌ No se pudo conectar con HoYoverse."

@@ -37,9 +37,12 @@ async def revisar_noticias():
         if noticia:
             embed = discord.Embed(
                 title="🌸 Teyvat News",
-                description=noticia,
+                description=f"📰 {noticia['titulo']}\n🔗 {noticia['url']}",
                 color=0xf1c40f
             )
+
+            if noticia["imagen"]:
+                embed.set_image(url=noticia["imagen"])
 
             await canal.send(embed=embed)
 

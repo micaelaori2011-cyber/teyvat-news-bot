@@ -26,6 +26,8 @@ def revisar_noticias():
     post = datos["data"]["list"][0]["post"]
 
     titulo = post["subject"]
+    print(post.keys())
+
     post_id = post["post_id"]
     url = f"https://www.hoyolab.com/article/{post_id}"
 
@@ -55,7 +57,6 @@ def revisar_noticias():
 
     except Exception:
         pass
-
 
     ULTIMA_NOTICIA = post_id
 
